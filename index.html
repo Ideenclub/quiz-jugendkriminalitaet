@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#5b3df5">
+<title>Recht oder Unrecht? Das Quiz</title>
+<meta name="description" content="Einstiegsquiz zum Thema Jugendkriminalität für Klasse 7">
+<style>
+:root{
+  --ink:#1d1b3a;
+  --ink-soft:#4a4870;
+  --card:#ffffff;
+  --line:#e6e3f5;
+  --ok:#14a06f;
+  --ok-bg:#e3f8ef;
+  --bad:#e0475b;
+  --bad-bg:#fde8eb;
+  --accent:#5b3df5;
+  --accent-soft:#ece8ff;
+  --radius:24px;
+  --shadow:0 10px 30px rgba(41,24,140,.12),0 2px 6px rgba(41,24,140,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);
+  background:#f4f1ff;
+  background-image:
+    radial-gradient(circle at 8% 12%,rgba(255,184,77,.35) 0,transparent 32%),
+    radial-gradient(circle at 92% 8%,rgba(91,61,245,.28) 0,transparent 35%),
+    radial-gradient(circle at 85% 92%,rgba(20,200,170,.28) 0,transparent 35%),
+    radial-gradient(circle at 5% 90%,rgba(255,95,140,.25) 0,transparent 32%);
+  background-attachment:fixed;
+  min-height:100vh;
+  touch-action:manipulation;
+  -webkit-text-size-adjust:100%;
+  hyphens:auto;
+}
+.wrap{max-width:920px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 20px max(28px,env(safe-area-inset-bottom))}
+.screen{display:none;animation:in .45s ease both}
+.screen.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- Start ---------- */
+.hero{background:var(--card);border-radius:32px;box-shadow:var(--shadow);padding:40px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0 0 auto 0;height:10px;background:linear-gradient(90deg,#ff5f8c,#ffb84d,#14c8aa,#3d8bff,#5b3df5)}
+.emoji-row{font-size:56px;letter-spacing:10px;margin:8px 0 14px}
+.kicker{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:800;border-radius:999px;padding:8px 18px;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.05;margin:16px 0 14px;letter-spacing:-.02em}
+h1 .grad{background:linear-gradient(90deg,#5b3df5,#ff5f8c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(18px,2.4vw,22px);color:var(--ink-soft);line-height:1.5;max-width:640px;margin:0 auto 26px}
+.facts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:0 0 30px}
+.fact{background:#f7f5ff;border:2px solid var(--line);border-radius:16px;padding:12px 18px;font-weight:700;font-size:17px}
+.btn{
+  appearance:none;border:0;cursor:pointer;font:inherit;font-weight:800;
+  font-size:22px;padding:20px 40px;min-height:68px;border-radius:20px;
+  color:#fff;background:linear-gradient(135deg,#5b3df5,#8a4dff);
+  box-shadow:0 8px 0 #3b25b8,0 14px 24px rgba(91,61,245,.35);
+  transition:transform .08s,box-shadow .08s;
+}
+.btn:active{transform:translateY(6px);box-shadow:0 2px 0 #3b25b8,0 6px 12px rgba(91,61,245,.3)}
+.btn:focus-visible{outline:4px solid #ffb84d;outline-offset:4px}
+.btn.secondary{background:#fff;color:var(--accent);box-shadow:0 6px 0 #cfc6ff,0 10px 18px rgba(91,61,245,.15);border:2px solid #cfc6ff}
+.rules{margin-top:26px;color:var(--ink-soft);font-size:16px}
+
+/* ---------- Top bar ---------- */
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.counter{font-weight:800;font-size:18px;white-space:nowrap;background:#fff;border-radius:999px;padding:10px 16px;box-shadow:var(--shadow)}
+.progress{flex:1;height:18px;background:rgba(255,255,255,.8);border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.progress span{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ff5f8c,#ffb84d,#14c8aa,#3d8bff,#5b3df5);background-size:920px 100%;transition:width .5s cubic-bezier(.3,1.4,.5,1)}
+.score-pill{font-weight:800;font-size:18px;background:#fff;border-radius:999px;padding:10px 16px;box-shadow:var(--shadow);white-space:nowrap}
+.dots{display:flex;gap:8px;justify-content:center;margin:-4px 0 18px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.9);border:2px solid #d8d2f7}
+.dot.ok{background:var(--ok);border-color:var(--ok)}
+.dot.bad{background:var(--bad);border-color:var(--bad)}
+.dot.now{border-color:var(--accent);transform:scale(1.25)}
+
+/* ---------- Question card ---------- */
+.qcard{background:var(--card);border-radius:32px;box-shadow:var(--shadow);overflow:hidden}
+.qhead{padding:26px 30px 24px;color:#fff;position:relative}
+.qhead .cat{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.22);border-radius:999px;padding:7px 14px;font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+.qhead .big-emoji{position:absolute;right:24px;top:14px;font-size:64px;opacity:.9;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15))}
+.qhead h2{font-size:clamp(23px,3.4vw,31px);line-height:1.25;margin:14px 0 0;padding-right:70px}
+.qbody{padding:24px 30px 30px}
+.scene{background:#faf8ff;border:2px dashed #d9d2ff;border-radius:18px;padding:16px 20px;font-size:19px;line-height:1.5;margin-bottom:20px;color:var(--ink)}
+.scene b{color:var(--accent)}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.answers{grid-template-columns:1fr}.qhead .big-emoji{font-size:46px}.qhead h2{padding-right:52px}}
+.ans{
+  appearance:none;font:inherit;text-align:left;cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  min-height:84px;padding:16px 18px;border-radius:20px;
+  background:#fff;border:3px solid var(--line);color:var(--ink);
+  font-size:19px;font-weight:650;line-height:1.3;
+  box-shadow:0 5px 0 var(--line);
+  transition:transform .08s,box-shadow .08s,border-color .15s,background .15s;
+}
+.ans:not([disabled]):active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.ans:focus-visible{outline:4px solid #ffb84d;outline-offset:2px}
+.ans .key{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:20px;color:#fff}
+.ans[disabled]{cursor:default}
+.ans.correct{border-color:var(--ok);background:var(--ok-bg);box-shadow:0 5px 0 #9ddfc4}
+.ans.correct .key{background:var(--ok)!important}
+.ans.wrong{border-color:var(--bad);background:var(--bad-bg);box-shadow:0 5px 0 #f4b5be}
+.ans.wrong .key{background:var(--bad)!important}
+.ans.dim{opacity:.5}
+.ans.picked{border-color:var(--accent);background:var(--accent-soft)}
+
+/* Slider */
+.slider-box{background:#faf8ff;border-radius:22px;padding:22px 22px 18px;border:2px solid var(--line)}
+.slider-val{font-size:64px;font-weight:900;text-align:center;line-height:1;margin-bottom:6px}
+.slider-val small{font-size:22px;font-weight:700;color:var(--ink-soft)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:56px;background:transparent;margin:6px 0}
+input[type=range]::-webkit-slider-runnable-track{height:16px;border-radius:999px;background:linear-gradient(90deg,#ffb84d,#ff5f8c,#5b3df5)}
+input[type=range]::-moz-range-track{height:16px;border-radius:999px;background:linear-gradient(90deg,#ffb84d,#ff5f8c,#5b3df5)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:48px;height:48px;border-radius:50%;background:#fff;border:5px solid var(--accent);margin-top:-16px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;background:#fff;border:5px solid var(--accent);box-shadow:0 4px 10px rgba(0,0,0,.2)}
+.scale{display:flex;justify-content:space-between;font-weight:700;color:var(--ink-soft);font-size:16px}
+.slider-actions{text-align:center;margin-top:18px}
+
+/* Feedback */
+.feedback{display:none;margin-top:22px;border-radius:24px;padding:22px 24px 24px;border:3px solid;animation:in .4s ease both}
+.feedback.show{display:block}
+.feedback.ok{background:var(--ok-bg);border-color:#9ddfc4}
+.feedback.bad{background:#fff6e8;border-color:#ffd48f}
+.feedback.neutral{background:var(--accent-soft);border-color:#cfc6ff}
+.fb-title{font-size:26px;font-weight:900;margin:0 0 8px;display:flex;align-items:center;gap:10px}
+.fb-text{font-size:19px;line-height:1.55;margin:0}
+.fb-text p{margin:0 0 10px}
+.law{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px;color:var(--ink-soft);margin:6px 6px 0 0;border:2px solid var(--line)}
+.hook{margin-top:16px;background:#fff;border-radius:18px;padding:14px 18px;font-size:18px;line-height:1.45;display:flex;gap:12px;align-items:flex-start}
+.hook .i{font-size:26px;line-height:1}
+.next-row{text-align:right;margin-top:18px}
+
+/* ---------- End ---------- */
+.end-card{background:var(--card);border-radius:32px;box-shadow:var(--shadow);padding:34px 32px;text-align:center;position:relative;overflow:hidden}
+.end-card::before{content:"";position:absolute;inset:0 0 auto 0;height:10px;background:linear-gradient(90deg,#ff5f8c,#ffb84d,#14c8aa,#3d8bff,#5b3df5)}
+.ring{width:210px;height:210px;margin:6px auto 12px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:54px}
+.ring .num small{display:block;font-size:18px;color:var(--ink-soft);font-weight:700;margin-top:-6px}
+.end-msg{font-size:clamp(24px,3.6vw,32px);font-weight:900;margin:6px 0 6px}
+.end-sub{font-size:19px;color:var(--ink-soft);margin:0 0 24px;line-height:1.5}
+.open-q{background:linear-gradient(135deg,#5b3df5,#ff5f8c);color:#fff;border-radius:28px;padding:30px 28px;text-align:left;margin:10px 0 18px;box-shadow:0 12px 30px rgba(91,61,245,.3)}
+.open-q .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:15px;opacity:.9}
+.open-q h3{font-size:clamp(25px,3.8vw,34px);line-height:1.2;margin:10px 0 18px}
+.impulses{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.impulses{grid-template-columns:1fr}}
+.impulse{background:rgba(255,255,255,.18);border-radius:18px;padding:14px 16px;font-size:18px;line-height:1.4}
+.impulse b{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;margin-bottom:4px}
+.recap{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;text-align:left;margin:18px 0 24px}
+.recap div{background:#faf8ff;border-radius:14px;padding:10px 14px;font-size:16px;font-weight:650;display:flex;gap:10px;align-items:center;border:2px solid var(--line)}
+details.sources{text-align:left;margin-top:26px;background:#faf8ff;border-radius:18px;padding:14px 18px;border:2px solid var(--line)}
+details.sources summary{cursor:pointer;font-weight:800;font-size:17px;min-height:36px;display:flex;align-items:center}
+details.sources ul{margin:10px 0 0;padding-left:20px;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+.end-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+
+/* Confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-20px;width:12px;height:18px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.pop{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- START -->
+  <section id="start" class="screen active" aria-labelledby="t-start">
+    <div class="hero">
+      <div class="emoji-row" aria-hidden="true">🤔⚖️📱</div>
+      <span class="kicker">Gesellschaftslehre · Klasse 7</span>
+      <h1 id="t-start">Recht oder <span class="grad">Unrecht?</span></h1>
+      <p class="lead">Schwarzfahren, Fotos im Klassenchat, Mutproben: Wo hört Spaß auf und wo fängt eine Straftat an? Teste, was du schon weißt. Einiges wird dich überraschen.</p>
+      <div class="facts">
+        <div class="fact">❓ 12 Fragen</div>
+        <div class="fact">⏱️ ca. 10 Minuten</div>
+        <div class="fact">💡 Erklärung nach jeder Frage</div>
+      </div>
+      <button class="btn" id="btn-start">Los geht’s! 🚀</button>
+      <p class="rules">Tippe auf die Antwort, die du für richtig hältst. Raten ist ausdrücklich erlaubt.</p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen" aria-live="polite">
+    <div class="topbar">
+      <div class="counter" id="counter">Frage 1 / 12</div>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="pbar"><span id="pfill"></span></div>
+      <div class="score-pill" id="scorepill">⭐ 0</div>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <article class="qcard" id="qcard">
+      <header class="qhead" id="qhead">
+        <span class="cat" id="qcat"></span>
+        <span class="big-emoji" id="qemoji" aria-hidden="true"></span>
+        <h2 id="qtext"></h2>
+      </header>
+      <div class="qbody">
+        <div class="scene" id="qscene" hidden></div>
+        <div id="qanswers"></div>
+        <div class="feedback" id="feedback" role="status">
+          <p class="fb-title" id="fbtitle"></p>
+          <div class="fb-text" id="fbtext"></div>
+          <div id="fblaw"></div>
+          <div class="hook" id="fbhook"><span class="i" aria-hidden="true">🔍</span><span id="fbhooktext"></span></div>
+          <div class="next-row"><button class="btn" id="btn-next">Weiter ➜</button></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- END -->
+  <section id="end" class="screen">
+    <div class="end-card">
+      <div class="ring" aria-hidden="true">
+        <svg width="210" height="210" viewBox="0 0 210 210">
+          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff5f8c"/><stop offset=".5" stop-color="#ffb84d"/><stop offset="1" stop-color="#5b3df5"/></linearGradient></defs>
+          <circle cx="105" cy="105" r="90" fill="none" stroke="#eee9ff" stroke-width="20"/>
+          <circle id="ringfill" cx="105" cy="105" r="90" fill="none" stroke="url(#g)" stroke-width="20" stroke-linecap="round" stroke-dasharray="565.49" stroke-dashoffset="565.49" style="transition:stroke-dashoffset 1.4s ease"/>
+        </svg>
+        <div class="num"><div><span id="endscore">0</span><small>von 12</small></div></div>
+      </div>
+      <p class="sr" id="endsr"></p>
+      <p class="end-msg" id="endmsg"></p>
+      <p class="end-sub" id="endsub"></p>
+
+      <div class="recap" id="recap"></div>
+
+      <div class="open-q">
+        <div class="lbl">💬 Zum Weiterdenken</div>
+        <h3>Ab 14 kann man in Deutschland bestraft werden. Ist das zu früh, zu spät oder genau richtig?</h3>
+        <div class="impulses">
+          <div class="impulse"><b>Denk an</b>Was kann ein 12-Jähriger schon einschätzen und was ein 16-Jähriger?</div>
+          <div class="impulse"><b>Und außerdem</b>Was hält Jugendliche eher von einer Straftat ab: Strafe oder etwas anderes?</div>
+        </div>
+      </div>
+
+      <div class="end-actions">
+        <button class="btn secondary" id="btn-restart">🔄 Nochmal spielen</button>
+      </div>
+
+      <details class="sources">
+        <summary>📚 Quellen (für Lehrkräfte)</summary>
+        <ul>
+          <li>Strafgesetzbuch (StGB): § 19 Strafmündigkeit, § 26 Anstiftung, § 27 Beihilfe, § 86a Kennzeichen verfassungswidriger Organisationen, § 242 Diebstahl, § 265a Erschleichen von Leistungen, § 303 Sachbeschädigung (gesetze-im-internet.de)</li>
+          <li>Jugendgerichtsgesetz (JGG): § 1 Altersstufen, § 2 Ziel, §§ 10, 15, 16, 18 Maßnahmen, § 105 Heranwachsende</li>
+          <li>Bürgerliches Gesetzbuch (BGB): § 828 Deliktsfähigkeit Minderjähriger</li>
+          <li>Kunsturhebergesetz (KUG): §§ 22, 33 Recht am eigenen Bild</li>
+          <li>Schulgesetz NRW: § 53 Erziehungs- und Ordnungsmaßnahmen</li>
+          <li>Polizeiliche Kriminalstatistik 2025 (BKA), tatverdächtige Kinder unter 14 Jahren: 95.410, davon 66.925 Jungen; Vorjahr 2024: 101.886 (DJI-Factsheet Kinderdelinquenz, Mai 2026; Deutscher Bundestag, hib 326/2025)</li>
+          <li>Strafmündigkeit international: England und Wales ab 10 Jahren (Children and Young Persons Act 1933, s. 50), Schweiz ab 10 (Jugendstrafgesetz Art. 3), Österreich ab 14 (JGG § 1)</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* Keine Datenspeicherung: kein localStorage, keine Cookies, keine externen Anfragen. */
+
+const COLORS = [
+  ["#5b3df5","#8a4dff"],["#ff5f8c","#ff8a5f"],["#14a6a0","#14c8aa"],["#3d8bff","#5b3df5"],
+  ["#ff8a1f","#ffb84d"],["#e0475b","#ff5f8c"],["#7a3df5","#c04dff"],["#0f9b6c","#2fc98e"],
+  ["#3d6bff","#3dc0ff"],["#ff5f8c","#b34dff"],["#5b3df5","#14c8aa"],["#ff8a1f","#e0475b"]
+];
+const KEYCOL = ["#5b3df5","#ff5f8c","#14a6a0","#ff8a1f"];
+
+const Q = [
+  {
+    short:"Was ist eine Straftat?", cat:"Grundfrage", emoji:"🧩",
+    q:"Welche dieser Situationen ist eine Straftat?",
+    a:["Im Unterricht heimlich mit dem Handy chatten",
+       "Als Fußgänger bei Rot über die Ampel gehen",
+       "Im Supermarkt einen Schokoriegel einstecken, ohne zu bezahlen",
+       "Ohne Helm Fahrrad fahren"],
+    c:2,
+    ok:"Genau!",
+    ex:"<p>Nicht jeder Regelverstoß ist gleich eine Straftat. Das Handy im Unterricht verstößt gegen die <b>Schulordnung</b>. Bei Rot zu gehen ist eine <b>Ordnungswidrigkeit</b>, dafür gibt es höchstens ein Bußgeld. Eine Helmpflicht fürs Fahrrad gibt es in Deutschland gar nicht.</p><p>Der Schokoriegel dagegen ist <b>Diebstahl</b>, und zwar egal, wie wenig er kostet. <b>Kriminalität</b> umfasst alle Taten, für die ein Strafgesetz eine Strafe vorsieht.</p>",
+    law:["§ 242 StGB Diebstahl"],
+    hook:"Wer legt eigentlich fest, was eine Straftat ist? Das entscheidet der Bundestag, wenn er Gesetze beschließt."
+  },
+  {
+    short:"Warum Regeln?", cat:"Deine Meinung", emoji:"🧭", opinion:true,
+    q:"Warum halten sich die meisten Menschen an Regeln, auch wenn gerade niemand hinschaut?",
+    a:["Weil sie Angst vor einer Strafe haben",
+       "Weil ihr Gewissen ihnen sagt, was richtig ist",
+       "Weil sie anderen nicht schaden wollen",
+       "Weil Familie und Freunde enttäuscht wären"],
+    ex:"<p>Hier gibt es kein Richtig oder Falsch, alle vier Gründe spielen eine Rolle. Die Kriminologie, also die Wissenschaft von Straftaten und ihren Ursachen, zeigt aber etwas Überraschendes: Bei den meisten Menschen wirken <b>Gewissen, eigene Werte und gute Beziehungen</b> stärker als die Angst vor Strafe.</p><p>Auch eine besonders harte Strafe schreckt weniger ab, als viele denken. Mehr Einfluss hat die Frage, ob man erwischt wird.</p>",
+    law:[],
+    hook:"Und warum brechen Menschen Regeln? Langeweile, Gruppendruck, Wut, Geldnot … Das schauen wir uns in den nächsten Stunden genauer an."
+  },
+  {
+    short:"Strafmündig ab 14", cat:"Grundfrage", emoji:"🎂",
+    q:"Ab welchem Alter kann man in Deutschland für eine Straftat bestraft werden?",
+    a:["Ab 12 Jahren","Ab 14 Jahren","Ab 16 Jahren","Ab 18 Jahren"],
+    c:1,
+    ok:"Richtig!",
+    ex:"<p>Ab dem <b>14. Geburtstag</b> ist man in Deutschland <b>strafmündig</b>. Wer jünger ist, gilt laut Strafgesetzbuch als „schuldunfähig“ und kann nicht vor einem Strafgericht verurteilt werden.</p><p>Zwischen 14 und 17 ist man <b>Jugendlicher</b>, zwischen 18 und 20 <b>Heranwachsender</b>. Für beide Gruppen kann das Jugendstrafrecht gelten. Ab 21 gilt immer das Strafrecht für Erwachsene.</p>",
+    law:["§ 19 StGB","§ 1 JGG"],
+    hook:"Mit 13 kann man also gar nichts falsch machen? Die nächste Frage zeigt, dass es so einfach nicht ist."
+  },
+  {
+    short:"Graffiti mit 13", cat:"Alltag", emoji:"🎨",
+    q:"Was stimmt in diesem Fall?",
+    scene:"<b>Paul ist 13.</b> Aus Spaß sprüht er sein Kürzel an das Glas einer Bushaltestelle. Ein Passant beobachtet ihn und ruft die Polizei.",
+    a:["Gar nichts passiert, mit 13 ist man nicht strafmündig",
+       "Paul kommt ins Jugendgefängnis",
+       "Paul wird nicht bestraft, muss den Schaden aber eventuell bezahlen",
+       "Die Stadt muss den Schaden ersetzen, nicht Paul"],
+    c:2,
+    ok:"Stimmt!",
+    ex:"<p>Bestraft werden kann Paul nicht, er ist noch keine 14. Das <b>Zivilrecht</b> sieht aber anders aus: Schon ab <b>7 Jahren</b> muss man für einen Schaden aufkommen, wenn man verstehen konnte, dass man etwas Falsches tut. Mit 13 ist das bei Graffiti klar der Fall.</p><p>Außerdem nimmt die Polizei den Fall auf, informiert die Eltern und meist auch das Jugendamt.</p>",
+    law:["§ 828 BGB Schadensersatz","§ 303 StGB Sachbeschädigung"],
+    hook:"Strafe und Schadensersatz sind zwei verschiedene Dinge. Kannst du den Unterschied mit eigenen Worten erklären?"
+  },
+  {
+    short:"Kaputte Schultoiletten", cat:"Schule", emoji:"🚽",
+    q:"In der Schule wurden Toiletten beschädigt und niemand wird erwischt. Wer bezahlt die Reparatur?",
+    a:["Die Schulleitung aus eigener Tasche",
+       "Die Klasse, deren Raum am nächsten liegt",
+       "Die Firma, die die Toiletten eingebaut hat",
+       "Die Stadt als Schulträger, also letztlich alle über Steuern"],
+    c:3,
+    ok:"Richtig!",
+    ex:"<p>Für das Schulgebäude ist in NRW der <b>Schulträger</b> zuständig, meistens die Stadt oder Gemeinde. Das Geld für die Reparatur kommt aus Steuern und fehlt dann woanders, zum Beispiel für neue Tablets oder Sportgeräte.</p><p>Wer Dinge absichtlich kaputt macht, begeht eine <b>Sachbeschädigung</b>. Wird jemand erwischt, muss er für den Schaden aufkommen. Die Schule kann zusätzlich <b>Ordnungsmaßnahmen</b> verhängen, etwa einen schriftlichen Verweis.</p>",
+    law:["§ 303 StGB","§ 53 SchulG NRW"],
+    hook:"Warum gehen manche mit Dingen, die allen gehören, schlechter um als mit ihrem eigenen Handy?"
+  },
+  {
+    short:"Schwarzfahren", cat:"Unterwegs", emoji:"🚌",
+    q:"Du fährst ohne gültiges Ticket Bus und wirst kontrolliert. Wie viel musst du in der Regel zahlen?",
+    a:["10 Euro","30 Euro","60 Euro","150 Euro"],
+    c:2,
+    ok:"Genau, 60 Euro!",
+    ex:"<p>Wer ohne gültigen Fahrschein erwischt wird, zahlt meist ein <b>„erhöhtes Beförderungsentgelt“ von 60 Euro</b>. Das ist eine Art Vertragsstrafe des Verkehrsunternehmens.</p><p>Ab 14 kann Schwarzfahren zusätzlich eine <b>Straftat</b> sein: „Erschleichen von Leistungen“. Angezeigt werden vor allem Leute, die öfter erwischt werden. Wer sein persönliches Abo-Ticket nur vergessen hat, kann es oft nachträglich vorzeigen, meist gegen eine kleine Gebühr.</p>",
+    law:["§ 265a StGB"],
+    hook:"Ob Schwarzfahren überhaupt eine Straftat sein sollte, darüber streitet die Politik seit Jahren. Was meinst du?"
+  },
+  {
+    short:"Fotos teilen", cat:"Internet", emoji:"📸",
+    q:"Was stimmt in diesem Fall?",
+    scene:"<b>Mia</b> fotografiert ihren Mitschüler <b>Ben</b> in der Mensa, als er Ketchup im Gesicht hat. Ohne zu fragen, stellt sie das Foto in den Klassenchat. Alle lachen.",
+    a:["Das ist erlaubt, solange es lustig ist",
+       "Das ist erlaubt, wenn sie Ben nicht markiert",
+       "Mia hätte Ben vorher fragen müssen",
+       "Verboten ist es nur, wenn Lehrkräfte im Chat sind"],
+    c:2,
+    ok:"Richtig!",
+    ex:"<p>Jeder Mensch darf selbst bestimmen, ob Fotos von ihm verbreitet werden. Das nennt man <b>Recht am eigenen Bild</b>. Wer ein Foto ohne Erlaubnis teilt, verstößt dagegen. Ab 14 kann das sogar strafbar sein.</p><p>Das Problem dabei: Ein Bild im Netz ist kaum wieder einzufangen. Ein Screenshot reicht, und es ist überall.</p>",
+    law:["§§ 22, 33 Kunsturhebergesetz"],
+    hook:"Wo hört Spaß auf und wo beginnt Cybermobbing? Wer legt die Grenze fest: Mia oder Ben?"
+  },
+  {
+    short:"Weiterleiten im Chat", cat:"Internet", emoji:"💬",
+    q:"In deiner Chatgruppe postet jemand ein Meme mit einem Hakenkreuz, „nur als Witz“. Was gilt, wenn du es weiterleitest?",
+    a:["Weiterleiten ist harmlos, ich habe es ja nicht erstellt",
+       "Auch Weiterleiten kann strafbar sein",
+       "Strafbar wird es erst ab 100 Leuten in der Gruppe",
+       "Das ist nur auf Instagram verboten, nicht im Messenger"],
+    c:1,
+    ok:"Stimmt!",
+    ex:"<p>Das Hakenkreuz ist ein Zeichen des Nationalsozialismus und in Deutschland verboten. Strafbar ist nicht nur, es selbst zu zeichnen. Wer es <b>verbreitet</b>, und dazu zählt auch Weiterleiten, kann sich ebenfalls strafbar machen. „War doch nur ein Witz“ ändert daran nichts.</p><p>Der beste Weg: <b>nicht weiterleiten</b> und einer Lehrkraft oder den Eltern Bescheid geben.</p>",
+    law:["§ 86a StGB"],
+    hook:"Was würdest du tun, wenn so etwas in deinem Klassenchat auftaucht, und warum tun viele lieber gar nichts?"
+  },
+  {
+    short:"Mutprobe in der Gruppe", cat:"Gruppe", emoji:"👥",
+    q:"Wer kann sich hier strafbar machen?",
+    scene:"Als Mutprobe soll <b>Tim (14)</b> im Drogeriemarkt ein Parfüm einstecken. <b>Max (14)</b> hat ihn dazu überredet. <b>Elif (14)</b> steht am Eingang und passt auf, ob jemand kommt.",
+    a:["Nur Tim, er hat es ja getan",
+       "Tim und Max",
+       "Alle drei",
+       "Niemand, es war ja nur eine Mutprobe"],
+    c:2,
+    ok:"Richtig, alle drei!",
+    ex:"<p>Tim ist der <b>Täter</b>. Max hat ihn überredet, das nennt man <b>Anstiftung</b>, und dafür droht die gleiche Strafe wie dem Täter. Elif hilft, indem sie Schmiere steht. Das ist <b>Beihilfe</b>.</p><p>Wer dagegen nur zufällig daneben steht und nichts tut, macht sich nicht strafbar.</p>",
+    law:["§ 242 StGB","§ 26 StGB Anstiftung","§ 27 StGB Beihilfe"],
+    hook:"Warum tut man in der Gruppe Dinge, die man allein nie machen würde? Und wie sagt man „Nein“, ohne als Feigling dazustehen?"
+  },
+  {
+    short:"Strafmündig in England", cat:"Schätzfrage", emoji:"🌍", slider:{min:6,max:18,start:12,answer:10,unit:"Jahre"},
+    q:"Schätze: Ab welchem Alter kann man in England bestraft werden?",
+    ex:"<p>In <b>England und Wales</b> ist man schon <b>ab 10 Jahren</b> strafmündig, in der <b>Schweiz</b> ebenfalls. In <b>Österreich</b> liegt die Grenze wie bei uns bei 14 Jahren.</p><p>Jedes Land entscheidet selbst, ab wann es Kindern zutraut, die Folgen ihres Handelns zu verstehen. Auch in Deutschland wird immer wieder diskutiert, ob 14 das richtige Alter ist.</p>",
+    law:["England & Wales: 10","Schweiz: 10","Österreich: 14"],
+    hook:"Wäre 10 für dich zu jung? Merk dir deine Meinung, wir kommen am Ende darauf zurück."
+  },
+  {
+    short:"Ziel Jugendstrafrecht", cat:"Grundfrage", emoji:"⚖️",
+    q:"Was ist das wichtigste Ziel des Jugendstrafrechts?",
+    a:["Jugendliche so hart wie möglich bestrafen",
+       "Erziehen, damit keine weiteren Straftaten passieren",
+       "Die Eltern für die Tat ihrer Kinder bestrafen",
+       "Jugendliche möglichst lange einsperren"],
+    c:1,
+    ok:"Genau!",
+    ex:"<p>Im Jugendstrafrecht steht der <b>Erziehungsgedanke</b> im Mittelpunkt: Junge Menschen sollen lernen und künftig keine Straftaten mehr begehen.</p><p>Das Jugendgericht kann deshalb zum Beispiel <b>Sozialstunden</b>, ein <b>Anti-Gewalt-Training</b>, eine Entschuldigung oder einen <b>Täter-Opfer-Ausgleich</b> anordnen, bei dem man den Schaden wiedergutmacht. Möglich sind auch Jugendarrest (höchstens 4 Wochen) oder, bei schweren Taten, Jugendstrafe im Gefängnis.</p>",
+    law:["§ 2 JGG","§§ 10, 15, 16 JGG"],
+    hook:"Würde dich eine Strafe, bei der du etwas wiedergutmachst, mehr zum Nachdenken bringen als Arrest?"
+  },
+  {
+    short:"Kinder in der Statistik", cat:"Schätzfrage", emoji:"📊",
+    q:"Wie viele Kinder unter 14 Jahren hat die Polizei 2025 in ganz Deutschland als tatverdächtig erfasst?",
+    a:["Rund 950","Rund 9.500","Rund 95.000","Rund 950.000"],
+    c:2,
+    ok:"Sehr gut geschätzt!",
+    ex:"<p>Laut <b>Polizeilicher Kriminalstatistik</b> waren es <b>95.410</b> Kinder, etwa 7 von 10 davon Jungen. Im Jahr davor waren es noch 101.886.</p><p>Wichtig: <b>Tatverdächtig</b> heißt nicht, dass jemand die Tat wirklich begangen hat. Und die Statistik zählt nur, was die Polizei erfährt. Kleine Regelverstöße kommen im Jugendalter häufig vor. Bei den meisten bleibt es aber eine kurze Phase, die von selbst wieder aufhört.</p>",
+    law:["PKS 2025, Bundeskriminalamt"],
+    hook:"Warum hören die meisten Jugendlichen von selbst wieder damit auf? Darum geht es gleich im Gespräch."
+  }
+];
+
+const $ = id => document.getElementById(id);
+let idx = 0, score = 0, results = [];
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function start(){
+  idx = 0; score = 0; results = [];
+  show("quiz"); render();
+}
+
+function renderDots(){
+  $("dots").innerHTML = Q.map((_,i)=>{
+    const r = results[i];
+    const cls = r===true?"ok":r===false?"bad":"";
+    return `<span class="dot ${cls} ${i===idx&&r===undefined?"now":""}"></span>`;
+  }).join("");
+}
+
+function render(){
+  const q = Q[idx], col = COLORS[idx % COLORS.length];
+  $("counter").textContent = `Frage ${idx+1} / ${Q.length}`;
+  $("pfill").style.width = (idx/Q.length*100)+"%";
+  $("pbar").setAttribute("aria-valuenow", idx);
+  $("scorepill").textContent = "⭐ "+score;
+  $("qhead").style.background = `linear-gradient(135deg,${col[0]},${col[1]})`;
+  $("qcat").textContent = q.cat;
+  $("qemoji").textContent = q.emoji;
+  $("qtext").textContent = q.q;
+  const sc = $("qscene");
+  if(q.scene){sc.innerHTML = q.scene; sc.hidden = false;} else {sc.hidden = true;}
+  $("feedback").className = "feedback";
+  renderDots();
+
+  const box = $("qanswers");
+  if(q.slider){
+    const s = q.slider;
+    box.innerHTML = `
+      <div class="slider-box">
+        <div class="slider-val"><span id="sv">${s.start}</span> <small>${s.unit}</small></div>
+        <input type="range" id="sl" min="${s.min}" max="${s.max}" step="1" value="${s.start}" aria-label="Alter schätzen">
+        <div class="scale"><span>${s.min}</span><span>${s.max}</span></div>
+        <div class="slider-actions"><button class="btn" id="btn-guess">Schätzung abgeben ✔</button></div>
+      </div>`;
+    $("sl").addEventListener("input", e=>{$("sv").textContent = e.target.value;});
+    $("btn-guess").addEventListener("click", ()=>answerSlider(+$("sl").value));
+  } else {
+    box.innerHTML = `<div class="answers">${q.a.map((t,i)=>
+      `<button class="ans" data-i="${i}"><span class="key" style="background:${KEYCOL[i]}">${"ABCD"[i]}</span><span>${t}</span></button>`
+    ).join("")}</div>`;
+    box.querySelectorAll(".ans").forEach(b=>b.addEventListener("click",()=>answer(+b.dataset.i)));
+  }
+}
+
+function feedback(kind,title,q){
+  const fb = $("feedback");
+  fb.className = "feedback show "+kind;
+  $("fbtitle").innerHTML = title;
+  $("fbtext").innerHTML = q.ex;
+  $("fblaw").innerHTML = q.law.map(l=>`<span class="law">${l.startsWith("§")?"📖":l.startsWith("PKS")?"📊":"🌍"} ${l}</span>`).join("");
+  $("fbhooktext").textContent = q.hook;
+  $("btn-next").textContent = idx === Q.length-1 ? "Zum Ergebnis 🏁" : "Weiter ➜";
+  $("scorepill").textContent = "⭐ "+score;
+  $("scorepill").classList.remove("pop"); void $("scorepill").offsetWidth; $("scorepill").classList.add("pop");
+  renderDots();
+  setTimeout(()=>fb.scrollIntoView({behavior:"smooth",block:"start"}),120);
+}
+
+function answer(i){
+  const q = Q[idx];
+  const btns = [...document.querySelectorAll(".ans")];
+  btns.forEach(b=>b.disabled = true);
+  if(q.opinion){
+    btns.forEach((b,j)=>b.classList.add(j===i?"picked":"dim"));
+    score++; results[idx] = true;
+    feedback("neutral","💭 Gute Wahl, jede Antwort zählt!",q);
+    return;
+  }
+  const right = i === q.c;
+  btns.forEach((b,j)=>{
+    if(j===q.c) b.classList.add("correct");
+    else if(j===i) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  if(right){score++; results[idx]=true; feedback("ok","✅ "+q.ok,q); burst(18);}
+  else {results[idx]=false; feedback("bad","🤓 Knapp daneben! Richtig ist: "+["A","B","C","D"][q.c],q);}
+}
+
+function answerSlider(v){
+  const q = Q[idx], s = q.slider;
+  $("sl").disabled = true; $("btn-guess").disabled = true; $("btn-guess").style.display="none";
+  const d = Math.abs(v - s.answer);
+  if(d===0){score++; results[idx]=true; feedback("ok",`🎯 Volltreffer! Es sind ${s.answer} Jahre.`,q); burst(30);}
+  else if(d===1){score++; results[idx]=true; feedback("ok",`✅ Fast genau! Es sind ${s.answer} Jahre.`,q); burst(18);}
+  else {results[idx]=false; feedback("bad",`😮 Überraschend, oder? Es sind nur ${s.answer} Jahre.`,q);}
+}
+
+function next(){
+  if(idx < Q.length-1){idx++; render(); window.scrollTo({top:0,behavior:"smooth"});}
+  else finish();
+}
+
+function finish(){
+  $("pfill").style.width = "100%";
+  show("end");
+  const n = Q.length;
+  $("endscore").textContent = score;
+  $("endsr").textContent = `Du hast ${score} von ${n} Punkten erreicht.`;
+  const C = 565.49;
+  setTimeout(()=>{$("ringfill").style.strokeDashoffset = C - C*score/n;},150);
+  let m, s;
+  if(score>=11){m="🏆 Wow, echte Rechts-Profis!"; s="Du kennst dich schon richtig gut aus. Mal sehen, ob du im Gespräch auch die kniffligen Fragen knackst.";}
+  else if(score>=8){m="🌟 Stark gemacht!"; s="Du hast ein gutes Gespür für Recht und Unrecht. Ein paar Dinge haben dich bestimmt überrascht.";}
+  else if(score>=5){m="👍 Guter Start!"; s="Vieles war neu, und genau dafür ist diese Einheit da. Jetzt weißt du schon mehr als vorher.";}
+  else {m="🚀 Jetzt geht’s erst richtig los!"; s="Viele Antworten waren überraschend, das geht den meisten so. In den nächsten Stunden findest du heraus, warum.";}
+  $("endmsg").textContent = m; $("endsub").textContent = s;
+  $("recap").innerHTML = Q.map((q,i)=>`<div>${results[i]?"✅":"🔸"} <span>${q.emoji} ${i+1}. ${q.short}</span></div>`).join("");
+  if(score>=8) burst(80);
+}
+
+function burst(n){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("div"); c.className="confetti";
+  const cols = ["#ff5f8c","#ffb84d","#14c8aa","#3d8bff","#5b3df5"];
+  for(let i=0;i<n;i++){
+    const p = document.createElement("i");
+    p.style.left = Math.random()*100+"vw";
+    p.style.background = cols[i%cols.length];
+    p.style.animationDuration = (1.6+Math.random()*1.6)+"s";
+    p.style.animationDelay = (Math.random()*.4)+"s";
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.appendChild(p);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),3800);
+}
+
+$("btn-start").addEventListener("click", start);
+$("btn-next").addEventListener("click", next);
+$("btn-restart").addEventListener("click", ()=>{show("start");});
+</script>
+</body>
+</html>
